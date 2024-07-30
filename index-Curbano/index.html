@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Requerimento Urbano</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h2 id="requerimento">REQUERIMENTO URBANO CEMIG</h2>
+
+        <form id="formulario" method="post">
+            <label for="numero_controle">NÚMERO DE CONTROLE:</label><br>
+            <input type="text" id="numero_controle" name="numero_controle" required readonly><br>
+
+            <label for="endereco">LOGRADOURO DO IMÓVEL:</label><br>
+            <input type="text" id="endereco" name="endereco" required><br>
+
+            <label for="numero">NÚMERO DO IMÓVEL:</label><br>
+            <input type="text" id="numero" name="numero" required><br>
+
+            <label for="comunidade">BAIRRO:</label><br>
+            <input type="text" id="comunidade" name="bairro" required><br>
+
+            <label for="proprietario">NOME DO PROPRIETÁRIO:</label><br>
+            <input type="text" id="proprietario" name="proprietario" required><br>
+
+            <label for="documento">CPF ou CNPJ:</label><br>
+            <select id="documento" name="documento" required>
+                <option value="CPF">CPF</option>
+                <option value="CNPJ">CNPJ</option>
+            </select><br>
+
+            <label id="label-cpf" for="cpf_cnpj">CPF do Proprietário:</label><br>
+            <input type="text" id="cpf_cnpj" name="cpf_cnpj" required><br>
+
+            <label for="area">ÁREA DO TERRENO:</label><br>
+            <input type="text" id="area" name="area" required><br>
+
+            <label for="unidade">UNIDADE DE MEDIDA:</label><br>
+            <select id="unidade" name="unidade" required>
+                <option value="m2">m²</option>
+                <option value="ha">ha</option>
+            </select><br>
+
+            <label for="responsavel">RESPONSÁVEL PELO REQUERIMENTO:</label><br>
+            <select id="responsavel" name="responsavel" required>
+                <option value="CARLOS DANIEL PEREIRA DE BRITO">CARLOS DANIEL PEREIRA DE BRITO</option>
+                <option value="ALISSON GUSMÃO CORDEIRO">ALISSON GUSMÃO CORDEIRO</option>
+                <option value="LUIZ FILLIPE MARTINS DA SILVA">LUIZ FILLIPE MARTINS DA SILVA</option>
+            </select><br>
+
+            <label for="data">DATA:</label><br>
+            <input type="date" id="data" name="data" required><br><br>
+
+            <button type="button" id="gerarEEnviar">Gerar e Enviar</button>
+            <p class="error-message" id="error-message"></p>
+        </form>
+        
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.0/html2pdf.bundle.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+       document.addEventListener('DOMContentLoaded', function() {
+            // Buscar o número de controle automaticamente ao carregar a página
+            fetch('https://script.google.com/macros/s/AKfycbzjjtm_mg_b8idNRh2bBjLCJBHsAP2EROpzme_SlvwvkRo33z0Sg0cL74HKuiJ_VmdR/exec?action=getNumeroControle')
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.numero_controle) {
+                        document.getElementById('numero_controle').value = data.numero_controle;
+                    } else {
+                        document.getElementById('error-message').textContent = 'Erro ao obter o número de controle.';
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('error-message').textContent = 'Erro ao obter o número de controle.';
+                });
+
+            document.getElementById('gerarEEnviar').addEventListener('click', function() {
+                var numeroControle = document.getElementById('numero_controle').value.toUpperCase();
+                var endereco = document.getElementById('endereco').value.toUpperCase();
+                var numero = document.getElementById('numero').value.toUpperCase();
+                var comunidade = document.getElementById('comunidade').value.toUpperCase();
+                var proprietario = document.getElementById('proprietario').value.toUpperCase();
+                var documento = document.getElementById('documento').value.toUpperCase();
+                var cpfCnpjLabel = (documento === 'CPF') ? 'CPF do proprietário:' : 'CNPJ do proprietário:';
+                var cpfCnpj = document.getElementById('cpf_cnpj').value.toUpperCase();
+                var area = document.getElementById('area').value.toUpperCase();
+                var unidade = document.getElementById('unidade').value.toUpperCase();
+                var data = document.getElementById('data').value;
+                var responsavel = document.getElementById('responsavel').value;
+
+                // Verificar se todos os campos estão preenchidos
+                if (!numeroControle || !endereco || !numero || !comunidade || !proprietario || !cpfCnpj || !area || !unidade || !responsavel || !data) {
+                    document.getElementById('error-message').textContent = 'Por favor, preencha todos os campos.';
+                    return;
+                }
+
+                // Limpar mensagem de erro
+                document.getElementById('error-message').textContent = '';
+
+                // Formatar a data para o formato brasileiro (dd/mm/yyyy)
+                var dataFormatada = formatarDataBR(data);
+
+                // Nome do arquivo
+                var nomeArquivo = 'REQUERIMENTO_CEMIG_URBANO_' + proprietario.replace(/\s+/g, '_') + '_NUMERO-CONTROLE' + numeroControle + '.pdf';
+
+                // Gerar o PDF com os dados do formulário
+                var conteudoPDF = `
+                <div>
+                    <img src="img/logo prefeitura.png" alt="Logo Prefeitura" style="width: 80px; height: 80px; display: block; margin:0 auto; margin-top:40px;">           
+                    <h3 style="margin:125px; margin-top:40px; margin-bottom:0; text-align:center;">PREFEITURA MUNICIPAL DE SÃO JOÃO DA PONTE ESTADO DE MINAS GERAIS</h3>
+                    <div class="container">
+                        <h1 style="color: black; text-align: center; text-decoration:underline; font-size:25px; margin: 120px; ">DECLARAÇÃO ENERGIA URBANO</h1>
+                        <p style="text-align:justify; margin:50px; margin-bottom:0;"><strong>A PREFEITURA DE SÃO JOÃO DA PONTE</strong>, entidade de direito público, vinculada ao Estado de Minas Gerais, inscrita no CNPJ sob o número <strong>16.928.483/0001-29</strong> e sediada NA PRAÇA OLÍMPIO CAMPOS, N° 128, CENTRO, SÃO JOÃO DA PONTE, vem, por meio deste, informar a <strong>CEMIG,</strong> sobre o endereço do imóvel localizado na <strong> ${endereco}</strong>, <strong>N° ${numero}</strong>, <strong>BAIRRO ${comunidade}</strong>, neste município, sob responsabilidade de <strong>${proprietario}</strong>, ${cpfCnpjLabel} <strong>${cpfCnpj}</strong>, e declaramos para o devido fim que o imóvel não tem impedimentos para ligação de energia.</p><br>
+                        <strong style="margin-left:50px;">Número de Controle:  ${numeroControle}-2</strong><br>
+                        <strong style="margin-left:50px">Área do Terreno:  ${area} ${unidade}</strong><br>
+                        <strong style="margin-left:50px">São João da Ponte / MG:  ${dataFormatada}</strong><br>
+                    </div>
+                    <div class="assinatura" style="text-align: center; margin-top:60px;">
+                        <p>___________________________________________</p><br>
+                        <strong style="text-align:center;">${responsavel}</strong><br><br>
+                        <strong style="text-align:center;">
+                            ${ responsavel === 'CARLOS DANIEL PEREIRA DE BRITO' ? 'FISCAL DE OBRAS' : (responsavel === 'ALISSON GUSMÃO CORDEIRO' ? 'CHEFE DO DEPARTAMENTO DE OBRAS' : 'SECRETÁRIO DE INFRAESTRUTURA')}
+                        </strong>
+                    </div>
+                </div>
+                `;
+
+                var opt = {
+                    margin: 0.5,
+                    filename: nomeArquivo,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                };
+
+                html2pdf().from(conteudoPDF).set(opt).save().then(function() {
+                    var formData = new FormData(document.getElementById('formulario'));
+
+                    fetch('https://script.google.com/macros/s/AKfycbzjjtm_mg_b8idNRh2bBjLCJBHsAP2EROpzme_SlvwvkRo33z0Sg0cL74HKuiJ_VmdR/exec', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.text())
+                    .then(result => {
+                        document.getElementById('error-message').textContent = 'Formulário enviado com sucesso!';
+                        // Atualizar a página para obter o próximo número de controle
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        document.getElementById('error-message').textContent = 'Erro ao enviar o formulário.';
+                    });
+                });
+            });
+
+            // Função para formatar a data no formato brasileiro
+            function formatarDataBR(data) {
+                var partes = data.split('-');
+                return partes[2] + '/' + partes[1] + '/' + partes[0];
+            }
+        });
+
+    </script>
+</body>
+</html>

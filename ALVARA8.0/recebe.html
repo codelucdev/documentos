@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informações Recebidas</title>
+    <link rel="stylesheet" href="CssRecebe/style.css">
+</head>
+<body>
+    <div class="form-container" id="capture">
+        <div class="cabecalho">
+            <img src="img/logoprefeitura.jpeg" id="imagemLog">
+            <h2>ALVARÁ DE LICENÇA E FUNCIONAMENTO <span id="numero_alvara"></span></h2>
+            <p><strong>DATA DO DOCUMENTO:</strong> <span id="datedocumento"></span></p>
+        </div>
+        <div class="campodados">
+            <p><strong>NOME/RAZÃO SOCIAL:</strong> <span id="responsavel"></span></p>
+            <p><strong>CPF/CNPJ:</strong> <span id="cpf_cnpj"></span></p>
+            <p><strong>ENDEREÇO DO EVENTO:</strong> <span id="endereco"></span></p>
+            <p>SÃO JOÃO DA PONTE - MG CEP: 39430-000</p>
+        </div>
+        <h2>COM A SEGUINTE ATIVIDADE PRINCIPAL</h2>
+        <div class="nomeevento">
+            <p>"<span id="evento"></span>"</p>
+        </div>
+        <div class="datas">
+            <div class="datainicio">
+                <p><strong>INICIO:</strong></p>
+                <span id="dateinicio"></span>
+            </div>
+            <div class="datafinal">
+                <p><strong>FIM:</strong></p>
+                <span id="datetermino"></span>
+            </div>
+        </div>
+        <div class="camporestricoes">
+            <p><strong>RESTRIÇÕES:</strong></p> 
+            <div id="restricoes" class="restricoes">
+                <span id="restricoes-text"></span>
+            </div>
+            <p id="pfixed">OS RESPONSÁVEIS DEVEM SEGUIR FIELMENTE AS NORMAS IMPOSTAS PELO CÓDIGO DE POSTURAS DO MUNICÍPIO. O PRESENTE ALVARÁ DEVERÁ SER FIXADO EM LOCAL VISÍVEL!</p>
+        </div>
+        <div class="campoassinatura">
+            <div class="assinatura1">
+                <p>___________________________________</p>
+                <p>Carlos Daniel Pereira de Brito</p>
+                <p>Fiscal de Posturas</p>
+            </div>
+            <div class="assinatura2">
+                <p>___________________________________</p>
+                <p>Carlos Antônio Lima</p>
+                <p>Secretário de Financas</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const [year, month, day] = dateString.split('-');
+            return `${day || '00'}/${month || '00'}/${year || '0000'}`;
+        }
+
+        function setTextContent(id, text) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = text ? text.toUpperCase() : '';
+            }
+        }
+
+        function updateFields() {
+            const datedocumento = localStorage.getItem('datedocumento');
+            const numero_alvara = localStorage.getItem('numero_alvara');
+            const endereco = localStorage.getItem('endereco');
+            const responsavel = localStorage.getItem('responsavel');
+            const cpf_cnpj = localStorage.getItem('cpf_cnpj');
+            const dateinicio = localStorage.getItem('dateinicio');
+            const datetermino = localStorage.getItem('datetermino');
+            const evento = localStorage.getItem('evento');
+            const restricoes = localStorage.getItem('restricoes');
+
+            setTextContent('datedocumento', formatDate(datedocumento));
+            setTextContent('numero_alvara', numero_alvara);
+            setTextContent('endereco', endereco);
+            setTextContent('responsavel', responsavel);
+            setTextContent('cpf_cnpj', cpf_cnpj);
+            setTextContent('dateinicio', formatDate(dateinicio));
+            setTextContent('datetermino', formatDate(datetermino));
+            setTextContent('evento', evento);
+            setTextContent('restricoes-text', restricoes);
+        }
+
+        function captureAndDownload() {
+            html2canvas(document.getElementById('capture'), { scale: 2 }).then(function(canvas) {
+                var link = document.createElement('a');
+                const alvaraNumber = localStorage.getItem('numero_alvara').replace(/\//g, '-');
+                const fileName = `alvara_${alvaraNumber}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                // Redirect to the original form page
+                window.location.href = 'index.html'; // Substitua pelo URL da página de origem
+            });
+        }
+
+        window.onload = function() {
+            updateFields();
+            setTimeout(captureAndDownload, 1000);
+        };
+    </script>
+</body>
+</html>

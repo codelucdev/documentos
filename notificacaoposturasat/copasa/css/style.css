@@ -1,0 +1,89 @@
+body, html{
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    
+}
+.container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    background-color: rgb(47, 132, 174);
+    border-radius: 6px;
+    box-shadow: 0 0 8px gray;
+    
+}
+form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: auto;
+    color: rgb(220, 220, 220);
+    
+}
+#formulario > div{
+    flex-direction: column;
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    align-items: center;
+    height: 75px;
+    
+}
+#numero_dias{
+    width: 100px;
+}
+h2{
+    text-align: center;
+    margin: 35px;
+    font-size: 25px;
+    color: rgb(220, 220, 220);
+}
+.pdf {
+    font-size: 16px;
+}
+
+section p {
+    text-align: justify;
+}
+
+input[type="text"],
+input[type="number"],
+button {
+    width: 90%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+.error-message {
+    color: red;
+    margin-top: 10px;
+
+}
+#foto{
+    width: 90%;
+    
+}
+#numero_noty{
+    background-color: rgb(194, 135, 135);
+    color: rgb(172, 19, 19);
+    text-align: center;
+}

@@ -1,0 +1,116 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+body, html {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+.form-container {
+    width: 210mm;
+    height: 297mm;
+    padding: 20mm;
+    box-sizing: border-box;
+    border: 1px solid #000;
+    background-color: #fff;
+    margin: 20px auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: column;
+}
+.cabecalho {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+.campodados {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    flex-direction: column;
+    border: solid 1px black;
+    border-radius: 3px;
+    padding: 3px 3px;
+}
+.campodados > p {
+    margin: 3px;
+}
+.nomeevento {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: solid 1px black;
+    border-radius: 3px;
+    padding: 3px 3px;
+}
+.datas {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.datas > .datainicio, .datafinal {
+    width: 200px;
+    height: 60px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border: solid 1px black;
+    border-radius: 3px;
+    flex-direction: column;
+}
+.camporestricoes {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-direction: column;
+    min-height: 200px;
+}
+/* Atualize a classe restricoes para lidar com o texto longo */
+.restricoes {
+    border: solid black 1px;
+    width: 100%;
+    min-height: 75px;
+    padding: 3px;
+    box-sizing: border-box;
+    text-align: justify; /* Justifica o texto dentro da div */
+    word-wrap: break-word; /* Quebra palavras longas se necessário */
+}
+
+/* Estilize os parágrafos dentro da restricoes para garantir que o texto seja formatado corretamente */
+.restricoes p {
+    margin: 0; /* Remove margem extra */
+    word-wrap: break-word; /* Quebra palavras longas */
+}
+
+/* Adicione uma regra geral para transformar todo o texto em maiúsculo */
+body, html {
+    text-transform: uppercase; /* Converte todo o texto para maiúsculo */
+}
+.campoassinatura{
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-around;
+
+}
+.campoassinatura > .assinatura1, .assinatura2{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+#pfixed{
+    text-align: center;
+}

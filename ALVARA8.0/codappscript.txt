@@ -1,0 +1,62 @@
+function doGet(e) {
+  var action = e.parameter.action;
+  if (action === 'getAlvaraNumber') {
+    return getAlvaraNumber();
+  }
+  return ContentService.createTextOutput('Ação inválida.').setMimeType(ContentService.MimeType.TEXT);
+}
+
+function getAlvaraNumber() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Dados');
+  var data = sheet.getRange('B:B').getValues(); // Supondo que a coluna 'numero_alvara' seja a coluna B
+  var maxNumber = 0;
+
+  for (var i = 0; i < data.length; i++) {
+    var numStr = data[i][0];
+    if (numStr) {
+      var numParts = numStr.split('/');
+      var num = parseInt(numParts[0], 10);
+      if (num > maxNumber) {
+        maxNumber = num;
+      }
+    }
+  }
+
+  var newNumber = (maxNumber + 1).toString().padStart(4, '0');
+  var currentYear = new Date().getFullYear();
+  var newAlvaraNumber = `${newNumber}/${currentYear}`;
+
+  var response = {
+    success: true,
+    numero_alvara: newAlvaraNumber
+  };
+
+  return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  Logger.log('Request Received: ' + JSON.stringify(e)); // Registra o evento completo
+
+  if (!e || !e.parameters) {
+    Logger.log('No parameters received.');
+    return ContentService.createTextOutput('No parameters received.');
+  }
+
+  var data = e.parameters;
+  var values = [
+    data.datedocumento ? data.datedocumento[0] : '',
+    data.numero_alvara ? data.numero_alvara[0] : '',
+    data.endereco ? data.endereco[0] : '',
+    data.responsavel ? data.responsavel[0] : '',
+    data.cpf_cnpj ? data.cpf_cnpj[0] : '',
+    data.dateinicio ? data.dateinicio[0] : '',
+    data.datetermino ? data.datetermino[0] : '',
+    data.evento ? data.evento[0] : '',
+    data.restricoes ? data.restricoes[0] : ''
+  ];
+
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Dados');
+  sheet.appendRow(values);
+
+  return ContentService.createTextOutput('Dados recebidos com sucesso!');
+}

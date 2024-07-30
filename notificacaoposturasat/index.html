@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificação Posturas</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css"/>
+</head>
+<body>
+    <div class="container">
+        <h2 id="notificacao">NOTIFICAÇÃO POSTURAS</h2>
+        <form id="formulario" method="post" action="#">
+            <select id="tipo" name="tipo" required>
+                <option value="Art. 7 - É dever da população cooperar com a Prefeitura na conservação e limpeza de logradouros públicos urbanos. Parágrafo único - Para efetivar a cooperação a que se refere o caput deste artigo fica vedado à população: V - Jogar entulhos provenientes de construções e demolições nas vias públicas, em terrenos de terceiros ou em terrenos baldios; Art. 12 - O responsável pela execução de serviços de construção de edificações, bem como consertos e conservação de edificações, fica obrigado a manter permanentemente em perfeito estado de limpeza o leito do logradouro público, no trecho compreendido pelas obras.">ENTULHO</option>
+                <option value="Art. 7 - É dever da população cooperar com a Prefeitura na conservação e limpeza de logradouros públicos urbanos. Parágrafo único - Para efetivar a cooperação a que se refere o caput deste artigo fica vedado à população: IV - Queimar, mesmo no interior de terrenos, lixos, detritos, plantas ou objetos em quantidade capaz de causar incômodo à vizinhança;">QUEIMA EM QUINTAL</option>
+                <option value="Art. 104 - As empresas ou particulares autorizados a fazerem abertura no calçamento ou escavações nas vias públicas são obrigados a colocar tabuletas
+                indicativas de perigo e interrupção de trânsito, convenientemente dispostos, além de luzes vermelhas durante a noite.
+                §1º - Todos os responsáveis por obras ou Serviços nos passeios, vias e logradouros públicos, quer sejam concessionários ou agentes executores, são obrigados a proteger esses locais mediante a retenção dos materiais de construção, dos resíduos —escavados e outros de qualquer — natureza, estocando-os convenientemente, sem apresentar transbordamento, e também recompor com materiais de qualidade igual ou superior ao removido.
+                §2º - Se verificado pelo agente de fiscalização e constatadas irregularidades no
+                serviço executado ou no material inferior ao retirado, deverá o responsável executar o reparo em até 5 (cinco) dias úteis.">PASSEIO DANIFICADO</option>
+                <option value="CARRO_ABANDONADO">CARRO ABANDONADO</option>
+                <option value="COPASA">COPASA</option>
+                <option value="LOTE-SUJO">LOTE-SUJO</option>
+            </select>
+            <div>
+                <label for="numeroNotifi">NÚMERO NOTIFICAÇÃO:</label>
+                <input type="text" id="numeroNotifi" name="numeroNotifi" readonly required>
+            </div>
+            <div>
+                <label for="endereco">ENDEREÇO DO LOTE:</label>
+                <input type="text" id="endereco" name="endereco" required>
+            </div>
+            <div>
+                <label for="bairro">BAIRRO:</label>
+                <input type="text" id="bairro" name="bairro" required>
+            </div>
+            <div>
+                <label for="proprietario">NOME DO NOTIFICADO:</label>
+                <input type="text" id="proprietario" name="proprietario" required>
+            </div>
+            <div>
+                <label for="numero_proximo">NÚMERO:</label>
+                <input type="text" id="numero_proximo" name="numero_proximo" placeholder="escreva 'NÚMERO' ou 'PRÓXIMO AO NÚMERO '"/>
+            </div>
+            <div>
+                <label for="numero_dias">PRAZO (em dias):</label>
+                <input type="number" id="numero_dias" name="numero_dias" required>
+            </div>
+            <div class="secfoto">
+                <label for="foto" id="labelselecimg">SELECIONAR FOTO:</label>
+                <input type="file" id="foto" name="foto" accept="image/*">
+            </div>
+            <div>
+                <button type="button" id="gerarPDF">Gerar Notificação</button>
+                <p class="error-message" id="error-message"></p>
+            </div>
+        </form>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.0/html2pdf.bundle.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tipoSelect = document.getElementById('tipo');
+            const numeroNotifi = document.getElementById('numeroNotifi');
+
+            // Gerar automaticamente o número da notificação
+            fetch('https://script.google.com/macros/s/AKfycbxhoIeNCFKMs6nMsSGr_9DWUaEEZoeMztulufIcBCftXwyaBOF5s4uILzGATwcmeAyM1w/exec?action=getNotificationNumber')
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.numero_notificacao) {
+                        numeroNotifi.value = data.numero_notificacao;
+                    } else {
+                        document.getElementById('error-message').textContent = 'Erro ao gerar o número da notificação.';
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('error-message').textContent = 'Erro ao gerar o número da notificação.';
+                });
+
+            tipoSelect.addEventListener('change', function() {
+                var tipo = tipoSelect.value;
+                if (tipo == "COPASA") {
+                    window.location.href = "copasa/index.html"; 
+                } else if (tipo == "LOTE-SUJO") {
+                    window.location.href = "lotesujo/index.html"; 
+                } else if (tipo == "CARRO_ABANDONADO") {
+                    window.location.href = "carroabandonado/index.html";
+                }
+            });
+
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    window.location.reload();
+                }
+            });
+
+            document.getElementById('gerarPDF').addEventListener('click', function() {
+                var numeroNotifi = document.getElementById('numeroNotifi').value.toUpperCase();
+                var endereco = document.getElementById('endereco').value.toUpperCase();
+                var bairro = document.getElementById('bairro').value.toUpperCase();
+                var proprietario = document.getElementById('proprietario').value.toUpperCase();
+                var prazoDias = document.getElementById('numero_dias').value;
+                var tipo = tipoSelect.value;
+                var foto = document.getElementById('foto').files[0];
+                var numero_proximo = document.getElementById('numero_proximo').value.toUpperCase();
+                var nomeArquivo = 'NOTIFICACAO_POSTURA_' + '_NUMERO-CONTROLE_' + numeroNotifi + '.pdf';
+
+                if (!numeroNotifi || !endereco || !bairro || !proprietario || !prazoDias) {
+                    document.getElementById('error-message').textContent = 'Por favor, preencha todos os campos.';
+                    return;
+                }
+
+                document.getElementById('error-message').textContent = '';
+
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    var fotoURL = event.target.result;
+                    var conteudoPDF = `
+                        <div class="pdf" style="display:flex; justify-content: center; align-itens: center; flex-direction: column;">
+                            <header style="display:flex; justify-content: center; align-items: center; flex-direction: column; margin: 50px 50px;">
+                                <img src="img/logoprefeitura.jpeg" alt="Logo Prefeitura" style="width: 100px; height: 100px;">
+                                <h2 style="color:black;">NOTIFICAÇÃO DE POSTURAS ${numeroNotifi}-2024</h2>
+                            </header>
+                            <section style="margin: 0 65px;">
+                                <p>Considerando o teor da Lei Municipal n°2.126/19 (Código de Posturas), a Prefeitura Municipal de São João da Ponte MG NOTIFICA <strong>${proprietario}</strong>,
+                                    titular de um imóvel na <strong>${endereco}, ${bairro}</strong>,<strong> ${numero_proximo}</strong> nos seguintes termos:
+                                </p>
+                                <p>${tipo}</p>
+                                <p>Sendo assim, <strong>${proprietario}</strong> fica <strong>CIENTE em reguralizar a situação acima descrita no prazo máximo de ${prazoDias}
+                                    dias a contar do recebimento deste, caso não cumpra com a notificação, o imóvel esta passivo de MULTA.</strong>
+                                </p>
+                                <p>Entretanto, fica o notificado ciente que caso reitere a infração verificada ou pratique outras condutas proibidas, poderá ser agravada a penalidade,
+                                    inclusive com a aplicação de multa e outras sanções descritas no artigo 180 da Lei Municipal n° 2.126/19.
+                                </p>
+                            </section>
+                            <footer style="display:flex; justify-content: center; align-items: center; flex-direction: column; height: 100%; width: 100%; padding-bottom: 250px;">
+                                <p>São João da Ponte MG ${new Date().toLocaleDateString()}</p>
+                                <p><strong>Data de vencimento:</strong> ${new Date(new Date().getTime() + (prazoDias * 24 * 60 * 60 * 1000)).toLocaleDateString()}</p>
+                                <p>_________________________________</p>
+                                <p>Carlos Daniel Pereira de Brito</p>
+                                <p>Fiscal de Obras</p>
+                                <p>Assinatura________________________________ Data de recebimento____/____/____</p>
+                            </footer>
+                            <div class="img" style="display:flex; justify-content: center; align-items: center; flex-direction: column; height: 100%; width: 100%; background-color:green;">
+                                <img src="${fotoURL}" alt="Foto" style="width: 600px; max-height: 800px;">
+                            </div>
+                        </div>
+                    `;
+
+                    html2pdf().from(conteudoPDF).set({
+                        filename: nomeArquivo,
+                        pagebreak: { mode: 'avoid-all' },
+                        html2canvas: { scale: 2 },
+                        jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+                    }).save().then(() => {
+                        // Enviar número da notificação para o servidor
+                        fetch('https://script.google.com/macros/s/AKfycbxhoIeNCFKMs6nMsSGr_9DWUaEEZoeMztulufIcBCftXwyaBOF5s4uILzGATwcmeAyM1w/exec', {
+                            method: 'POST',
+                            body: new URLSearchParams({ numeroNotifi: numeroNotifi })
+                        })
+                        .then(response => response.text())
+                        .then(data => {
+                            document.getElementById('error-message').textContent = data;
+                            // Recarregar a página após enviar os dados
+                            window.location.reload();
+                        })
+                        .catch(error => {
+                            document.getElementById('error-message').textContent = 'Erro ao enviar os dados.';
+                            // Recarregar a página mesmo em caso de erro para tentar novamente
+                            window.location.reload();
+                        });
+                    });
+                };
+
+                if (foto) {
+                    reader.readAsDataURL(foto);
+                } else {
+                    reader.onload(); // Chamar diretamente se não houver foto
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>

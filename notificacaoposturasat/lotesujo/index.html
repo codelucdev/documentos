@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificação de Lote Sujo</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h2 id="notificacao">NOTIFICAÇÃO LOTE SUJO</h2>
+        <form id="formulario" method="post" action="#">
+            <div>
+                <label for="numero_lote">NÚMERO NOTIFICAÇÃO:</label>
+                <input type="text" id="numero_lote" name="numero_lote" readonly required>
+            </div>
+            <div>
+                <label for="endereco">ENDEREÇO DO LOTE:</label>
+                <input type="text" id="endereco" name="endereco" required>
+            </div>
+            <div>
+                <label for="bairro">BAIRRO:</label>
+                <input type="text" id="bairro" name="bairro" required>
+            </div>
+            <div>
+                <label for="proprietario">NOME DO PROPRIETÁRIO:</label>
+                <input type="text" id="proprietario" name="proprietario" required>
+            </div>
+            <div>
+                <label for="numero_dias">PRAZO (em dias):</label>
+                <input type="number" id="numero_dias" name="numero_dias" required>
+            </div>
+            <div>
+                <label for="foto">SELECIONAR FOTO:</label>
+                <input type="file" id="foto" name="foto" accept="image/*">
+            </div>
+            <div>
+                <button type="button" id="gerarPDF">Gerar Notificação</button>
+                <p class="error-message" id="error-message"></p>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.0/html2pdf.bundle.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Buscar o número de notificação automaticamente ao carregar a página
+            fetch('https://script.google.com/macros/s/AKfycbxhoIeNCFKMs6nMsSGr_9DWUaEEZoeMztulufIcBCftXwyaBOF5s4uILzGATwcmeAyM1w/exec?action=getNotificationNumber')
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.numero_notificacao) {
+                        document.getElementById('numero_lote').value = data.numero_notificacao;
+                    } else {
+                        document.getElementById('error-message').textContent = 'Erro ao obter o número de notificação.';
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('error-message').textContent = 'Erro ao obter o número de notificação.';
+                });
+
+            document.getElementById('gerarPDF').addEventListener('click', function() {
+                var numeroLote = document.getElementById('numero_lote').value.toUpperCase();
+                var endereco = document.getElementById('endereco').value.toUpperCase();
+                var bairro = document.getElementById('bairro').value.toUpperCase();
+                var proprietario = document.getElementById('proprietario').value.toUpperCase();
+                var prazoDias = document.getElementById('numero_dias').value;
+                var foto = document.getElementById('foto').files[0]; // Capturar o arquivo de imagem selecionado
+
+                // Verificar se todos os campos estão preenchidos
+                if (!numeroLote || !endereco || !bairro || !proprietario || !prazoDias) {
+                    document.getElementById('error-message').textContent = 'Por favor, preencha todos os campos.';
+                    return;
+                }
+
+                // Limpar mensagem de erro
+                document.getElementById('error-message').textContent = '';
+
+                // Criar objeto FileReader para ler o conteúdo da imagem
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    var fotoURL = event.target.result; // URL da imagem selecionada
+                    var conteudoPDF = `
+                        <div class="pdf" style="display:flex; justify-content: center; align-itens: center; flex-direction: column;">
+                            <header style="display:flex; justify-content: center; align-items: center; flex-direction: column; margin: 50px 50px;">
+                                <img src="img/logoprefeitura.jpeg" alt="Logo Prefeitura" style="width: 100px; height: 100px;">
+                                <h2  style="color:black;">NOTIFICAÇÃO DE LOTE SUJO ${numeroLote}-2024</h2>
+                            </header>
+
+                            <section style="margin: 0 65px;">
+                                <p>Considerando o teor da Lei Municipal n°2.126/19 (Código de Posturas), a Prefeitura Municipal de São João da Ponte MG NOTIFICA <strong>${proprietario}</strong>,
+                                    titular de um lote na <strong>${endereco}, ${bairro}</strong>, nos seguintes termos:
+                                </p>
+                                <p>
+                                    Art. 13. - Os terrenos situados na área urbana e de expansão urbana deste Município deverão ser mantidos limpos,
+                                    capinados e isentos de quaisquer materiais nocivos a saúde da vizinhança e da coletividade.
+                                </p>
+                                <p>
+                                    §1° - A capinação do terreno deverá ser realizada por, pelo menos,
+                                    03 (três) vezes por ano e toda vez que a vegetação atingir mais de 50 cm (cinquenta centímetros) de altura.
+                                </p>
+                                <p>
+                                    Art. 17 – É Proibido depositar ou descarregar qualquer espécie de lixo, folhagem de jardins ou resíduos industriais, em terrenos localizados
+                                    nos núcleos urbanos ou na área em expansão urbana, mesmo que os referidos terrenos não estejam devidamente fechados.
+                                </p>
+                                <p>
+                                    Sendo assim, <strong>${proprietario}</strong> fica <strong>CIENTE a efetuar a limpeza do lote acima citado no prazo máximo de ${prazoDias}
+                                    dias a contar do recebimento deste, caso não cumpra com a notificação, o imóvel esta passivo de MULTA.</strong>
+                                </p>
+                                <p>
+                                    Entretanto, fica o notificado ciente que caso reitere a infração verificada ou pratique outras condutas proibidas, poderá ser agravada a penalidade,
+                                    inclusive com a aplicação de multa e outras sanções descritas no artigo 180 da Lei Municipal n° 2.126/19.
+                                </p>
+                            </section>
+
+                            <footer style="display:flex; justify-content: center; align-items: center; flex-direction: column; heigh: 100%; width: 100%; padding-bottom: 250px;" >
+                                <p>São João da Ponte MG ${new Date().toLocaleDateString()}</p>
+                                <p><strong>Data de vencimento:</strong> ${new Date(new Date().getTime() + (prazoDias * 24 * 60 * 60 * 1000)).toLocaleDateString()}</p>
+                                <p>_________________________________</p>
+                                <p>Carlos Daniel Pereira de Brito</p>
+                                <p>Fiscal de Obras</p>
+                                <p>Assinatura________________________________ Data de recebimento____/____/____</p>
+                            </footer>
+                            <div class="img" style="display:flex; justify-content: center; align-items: center; flex-direction: column; heigh: 100%; width: 100%;backgroud-color:green;">
+                                    <img src="${fotoURL}" alt="Foto" style="width: 600px; max-height: 800px;">
+                            </div>
+                        </div>
+                    `;
+
+                    // Gerar o PDF com os dados da notificação e a imagem
+                    html2pdf().from(conteudoPDF).set({
+                        filename: 'notificacao_lote_sujo.pdf',
+                        pagebreak: { mode: 'avoid-all' },
+                        html2canvas: { scale: 2 },
+                        jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+                    }).save();
+
+                    // Enviar número de notificação para o Apps Script
+                    fetch('https://script.google.com/macros/s/AKfycbxhoIeNCFKMs6nMsSGr_9DWUaEEZoeMztulufIcBCftXwyaBOF5s4uILzGATwcmeAyM1w/exec', {
+                        method: 'POST',
+                        body: new URLSearchParams({ numeroNotifi: numeroLote })
+                    })
+                    .then(response => response.text())
+                    .then(data => {
+                        document.getElementById('error-message').textContent = data;
+                        // Recarregar a página para obter um novo número de notificação
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        document.getElementById('error-message').textContent = 'Erro ao enviar os dados.';
+                    });
+                };
+
+                if (foto) {
+                    reader.readAsDataURL(foto);
+                } else {
+                    reader.onload();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerar PDF</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+    <script src="script/script.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Formulário de Requerimento</h1>
+        <form id="requerimento-form">
+            
+            <label for="numero_controle">NÚMERO DE CONTROLE:</label><br>
+            <input type="text" id="numero_controle" name="numero_controle" readonly><br>
+            <label for="endereco">ENDEREÇO:</label><br>
+            <input type="text" id="endereco" name="endereco" required><br>
+            <label for="numero">NÚMERO:</label><br>
+            <input type="text" id="numero" name="numero" required><br>
+            <label for="comunidade">COMUNIDADE:</label><br>
+            <input type="text" id="comunidade" name="comunidade" required><br>
+            <label for="proprietario">NOME DO PROPRIETÁRIO:</label><br>
+            <input type="text" id="proprietario" name="proprietario" required><br>
+            <label for="documento">DOCUMENTO:</label><br>
+            <select id="documento" name="documento" required>
+                <option value="CPF">CPF</option>
+                <option value="CNPJ">CNPJ</option>
+            </select><br>
+            <label id="label-cpf" for="cpf_cnpj">CPF DO PROPRIETÁRIO:</label><br>
+            <input type="text" id="cpf_cnpj" name="cpf_cnpj" required><br>
+            <label for="data">DATA:</label><br>
+            <input type="date" id="data" name="data" required><br><br>
+            <button type="button" id="gerarPDF">Gerar PDF</button>
+            <p id="error-message" style="color: red;"></p>
+        </form>
+    </div>
+</body>
+</html>

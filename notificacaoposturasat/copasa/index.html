@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificação de Lote Sujo</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script src="script/script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2 id="notificacao">NOTIFICAÇÃO COPASA</h2>
+        <form id="formulario" method="post" action="#">
+            <div>
+                <label for="numero_noty">NÚMERO NOTIFICAÇÃO:</label>
+                <input type="text" id="numero_noty" name="numero_noty" readonly required>
+            </div>
+            <div>
+                <label for="rua">RUA DA NOTIFICAÇÃO:</label>
+                <input type="text" id="rua" name="rua" required>
+            </div>
+            <div>
+                <label for="bairro">BAIRRO:</label>
+                <input type="text" id="bairro" name="bairro" required>
+            </div>
+            <div>
+                <label for="n_proximo">N° PRÓXIMO:</label>
+                <input type="text" id="n_proximo" name="n_proximo" required>
+            </div>
+            <div>
+                <label for="numero_dias">PRAZO (em dias):</label>
+                <input type="number" id="numero_dias" name="numero_dias" required>
+            </div>
+            <label for="responsavel">RESPONSÁVEL PELA NOTIFICAÇÃO:</label><br>
+            <select id="responsavel" name="responsavel" required>
+                <option value="ALISSON GUSMÃO CORDEIRO">ALISSON GUSMÃO CORDEIRO</option>
+                <option value="Carlos Daniel Pereira de Brito">Carlos Daniel Pereira de Brito</option>
+                <option value="LUIZ FILLIPE MARTINS DA SILVA">LUIZ FILLIPE MARTINS DA SILVA</option>
+            </select><br>
+            <div>
+                <label for="foto">SELECIONAR FOTO:</label>
+                <input type="file" id="foto" name="foto" accept="image/*">
+            </div>
+            <div>
+                <button type="button" id="gerarPDF">Gerar Notificação</button>
+                <p class="error-message" id="error-message"></p>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.0/html2pdf.bundle.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Buscar o número de notificação automaticamente ao carregar a página
+            fetch('https://script.google.com/macros/s/AKfycbxhoIeNCFKMs6nMsSGr_9DWUaEEZoeMztulufIcBCftXwyaBOF5s4uILzGATwcmeAyM1w/exec?action=getNotificationNumber')
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.numero_notificacao) {
+                        document.getElementById('numero_noty').value = data.numero_notificacao;
+                    } else {
+                        document.getElementById('error-message').textContent = 'Erro ao obter o número de notificação.';
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('error-message').textContent = 'Erro ao obter o número de notificação.';
+                });
+
+            document.getElementById('gerarPDF').addEventListener('click', function() {
+                var numeroNotifi = document.getElementById('numero_noty').value;
+                var rua = document.getElementById('rua').value.toUpperCase();
+                var bairro = document.getElementById('bairro').value.toUpperCase();
+                var nProximo = document.getElementById('n_proximo').value.toUpperCase();
+                var prazoDias = document.getElementById('numero_dias').value;
+                var responsavel = document.getElementById('responsavel').value;
+                var foto = document.getElementById('foto').files[0];
+                var nomeArquivo = 'NOTIFICACAO_COPASA_' + numeroNotifi + '.pdf';
+
+                if (!numeroNotifi || !rua || !bairro || !nProximo || !prazoDias || !responsavel) {
+                    document.getElementById('error-message').textContent = 'Por favor, preencha todos os campos.';
+                    return;
+                }
+
+                document.getElementById('error-message').textContent = '';
+
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    var fotoURL = event.target.result;
+                    var conteudoPDF = `
+                        <div class="pdf" style="display:flex; justify-content: center; align-items: center; flex-direction: column;">
+                            <header style="display:flex; justify-content: center; align-items: center; flex-direction: column; margin: 50px 50px;">
+                                <img src="img/logoprefeitura.jpeg" alt="Logo Prefeitura" style="width: 100px; height: 100px;">
+                                <h2 style="color:black;">NOTIFICAÇÃO COPASA ${numeroNotifi}-2024</h2>
+                            </header>
+                            <section style="margin: 0 65px;">
+                                <p style="text-indent: 3em;">
+                                    <strong>A SECRETARIA DE OBRAS E SERVIÇOS URBANOS DO MUNICÍPIO DE SÃO JOÃO DA PONTE</strong>, entidade de direito público interno, pertencente ao Estado de Minas Gerais,
+                                    no CNPJ sob n° 16.928.483/0001-29, sediada na Praça Olímpio Campos, n° 128, Centro, nesta cidade de São João da Ponte, vem perante a Vossa Senhoria
+                                    promover <strong>NOTIFICAÇÂO PRELIMINAR</strong>, ficando assim a entidade obrigada a recompor a via pública, conforme foto anexa, localizada na ${rua}, próximo 
+                                    ao imóvel n° ${nProximo}, ${bairro}, neste município, com o piso existente anteriormente, <strong>no prazo máximo de ${prazoDias} dias</strong> a contar do recebimento.
+                                </p>
+                                <p><em>LEI MUNICIPAL n° 2.212/2021 DE JULHO DE 2021</em></p>
+                                <p style="text-indent: 3em;">
+                                    <em>"Torna obrigatória a reconstrução e via pública pela COPASA - Companhia de Saneamento de Minas Gerais, após haver promovido escavação para reparar redes de água ou esgotamento sanitário e/ou colocação
+                                    de novas instalações e dá outras providencias."</em>
+                                </p>
+                                <p style="text-indent: 3em;">
+                                    Saliento que o não cumprimento desta NOTIFICAÇÃO PRELIMINAR no prazo estipulado pela Lei Municipal acarretará MULTA DIÁRIA no valor de 350 UFM (Unidade Fiscal Municipal),
+                                    o que equivale hoje ao valor de R$ 2.086,00 (dois mil e oitenta e seis reais), que somente cessará a cobrança até que seja restabelecida a via para seu uso regular. 
+                                </p>
+                                <br><br>
+                                <p>São João da Ponte MG ${new Date().toLocaleDateString()}</p>
+                                <p style="padding-bottom: 30px;"><strong>Data de vencimento:</strong> ${new Date(new Date().getTime() + (prazoDias * 24 * 60 * 60 * 1000)).toLocaleDateString()}</p>
+                            </section>
+                            <footer style="display:flex; justify-content: center; align-items: center; flex-direction: column; height: 100%; width: 100%; padding-bottom:250px;">
+                                <p>_________________________________</p>
+                                <p style="text-align:center;"><strong>${responsavel}</strong></p>
+                                <p><strong style="text-align:center;">${responsavel === 'Carlos Daniel Pereira de Brito' ? 'FISCAL DE OBRAS' : (responsavel === 'ALISSON GUSMÃO CORDEIRO' ? 'CHEFE DO DEPARTAMENTO DE OBRAS' : 'SECRETÁRIO DE INFRAESTRUTURA')}</strong></p>
+                                <p style="text-align: center; padding-top: 18px;">Assinatura________________________________ Data de recebimento____/____/____</p>
+                            </footer>
+                            <div class="img" style="display:flex; justify-content: center; align-items: center; flex-direction: column; height: 100%; width: 100%;">
+                                <img src="${fotoURL}" alt="Foto" style="width: 600px; max-height: 800px;">
+                            </div>
+                        </div>
+                    `;
+
+                    html2pdf().from(conteudoPDF).set({
+                        filename: nomeArquivo,
+                        pagebreak: { mode: 'avoid-all' },
+                        html2canvas: { scale: 2 },
+                        jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+                    }).save();
+
+                    fetch('https://script.google.com/macros/s/AKfycbxhoIeNCFKMs6nMsSGr_9DWUaEEZoeMztulufIcBCftXwyaBOF5s4uILzGATwcmeAyM1w/exec', {
+                        method: 'POST',
+                        body: new URLSearchParams({ numeroNotifi: numeroNotifi })
+                    })
+                    .then(response => response.text())
+                    .then(data => {
+                        document.getElementById('error-message').textContent = data;
+                        // Recarregar a página para obter um novo número de notificação
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        document.getElementById('error-message').textContent = 'Erro ao enviar os dados.';
+                    });
+                };
+
+                if (foto) {
+                    reader.readAsDataURL(foto);
+                } else {
+                    reader.onload();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

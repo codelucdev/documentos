@@ -1,0 +1,102 @@
+
+body, html {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    flex-direction: column;
+}
+.container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    background-color: rgb(47, 132, 174);
+    border-radius: 6px;
+    box-shadow: 0 0 8px gray;
+}
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: auto;
+    font-size: 13px;
+    color: rgb(220, 220, 220);
+}
+#formulario > div {
+    flex-direction: column;
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    align-items: center;
+    height: 75px;
+}
+#numero_dias {
+    width: 100px;
+}
+h2 {
+    text-align: center;
+    margin: 35px;
+    font-size: 25px;
+    color: rgb(220, 220, 220);
+}
+
+input[type="text"],
+input[type="number"],
+button {
+    width: 90%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 16px;
+    text-transform: uppercase;
+}
+button {
+    background-color: #4CAF50;
+    border: none;
+    cursor: pointer;
+    color: rgb(220, 220, 220)
+}
+button:hover {
+    background-color: #45a049;
+}
+.error-message {
+    color: red;
+    margin-top: 10px;
+}
+.pdf {
+    font-size: 16px;
+}
+
+section p {
+    text-align: justify;
+}
+
+#tipo{
+    background-color: #45a049;
+    min-width: 80%;
+    min-height: 30px;
+    border: none;
+    font-size: 13px;
+    text-align: center;
+}
+.secfoto{
+    border: 1px solid rgb(26, 0, 175);
+    border-radius: 2px;
+    color: black;
+}
+#foto{
+    align-items: center;
+    background-color: rgb(196, 196, 196);
+}
+#labelselecimg{
+    color: white ;
+}
+#numeroNotifi{
+    background-color: rgb(194, 135, 135);
+    color: rgb(172, 19, 19);
+    text-align: center;
+}
