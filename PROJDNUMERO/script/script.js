@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 PERIMETRO URBANO, NESTA CIDADE DE SÃO JOÃO DA PONTE – MG.
             <p><br>
         
-            <strong style="margin-left:50px">Número de Controle: ${numeroControle}-2</strong><br>
+            <strong style="margin-left:50px">Número de Controle: ${numeroControle}</strong><br>
             <strong style="margin-left:50px">São João da Ponte / MG, ${dataFormatada}</strong>
         </div>
 
